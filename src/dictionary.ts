@@ -1,4 +1,4 @@
-export const DICTIONARY: Record<string, string> = {
+export const DICTIONARY = {
   "A": ".-",
   "B": "-...",
   "C": "-.-.",
@@ -36,4 +36,4 @@ export const DICTIONARY: Record<string, string> = {
   "8": "---..",
   "9": "----.",
   " ": "/",
-};
+} as const;

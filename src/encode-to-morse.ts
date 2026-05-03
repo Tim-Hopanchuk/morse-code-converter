@@ -1,114 +1,90 @@
 import { DICTIONARY } from "./dictionary";
-import type { MorseConfig } from "./types";
+import type { Config } from "./types";
 
-export function encodeToMorse(
-  text: string,
-  config: MorseConfig = {
+export function encodeToMorse(text: string, config: Config = {}): string {
+  validateInput(text, config);
+
+  const normalizedText: string = text
+    .trim()
+    .replaceAll(/\s+/g, " ")
+    .toUpperCase();
+  const normalizedConfig: Required<Config> = {
     dot: ".",
     dash: "-",
     charDelim: " ",
     wordDelim: "/",
     ignoreUnknown: false,
-  },
-): string {
-  if (!isValidInput(text, config)) {
-    throw new Error("Invalid input");
-  }
+    ...config,
+  };
 
-  const normalizedText: string = normalizeText(text);
-  const updatedDictionary: Record<string, string> = updateDictionary(
-    DICTIONARY,
-    config,
-  );
+  const codes: string[] = [];
 
-  let encodedText: string = "";
-
-  for (const char of normalizedText) {
-    if (!(char in updatedDictionary)) {
-      if (!config.ignoreUnknown) {
-        throw new Error("Invalid input");
-      }
-
+  for (const letter of normalizedText) {
+    if (letter in DICTIONARY) {
+      codes.push(getCode(letter, normalizedConfig));
       continue;
     }
 
-    encodedText += updatedDictionary[char] + config.charDelim;
+    if (!normalizedConfig.ignoreUnknown) {
+      throw new Error("Invalid input: unsupported character in text");
+    }
   }
 
-  encodedText = encodedText.slice(0, encodedText.lastIndexOf(config.charDelim));
+  const encodedText: string = codes.join(normalizedConfig.charDelim);
 
   return encodedText;
 }
 
-function isValidInput(text: unknown, config: unknown): boolean {
-  if (
-    typeof text !== "string" ||
-    typeof config !== "object" ||
-    config === null
-  ) {
-    return false;
+function getCode(letter: string, normalizedConfig: Required<Config>): string {
+  const key = letter as keyof typeof DICTIONARY;
+
+  let code: string = "";
+
+  for (const char of DICTIONARY[key]) {
+    switch (char) {
+      case ".":
+        code += normalizedConfig.dot;
+        break;
+      case "-":
+        code += normalizedConfig.dash;
+        break;
+      case "/":
+        code += normalizedConfig.wordDelim;
+        break;
+    }
   }
 
-  if (
-    !("dot" in config) ||
-    !("dash" in config) ||
-    !("charDelim" in config) ||
-    !("wordDelim" in config) ||
-    !("ignoreUnknown" in config)
-  ) {
-    return false;
+  return code;
+}
+
+function validateInput(text: unknown, config: unknown): void {
+  if (typeof text !== "string") {
+    throw new TypeError("Invalid input: expected 'text' to be a string");
   }
 
+  if (typeof config !== "object" || config === null || Array.isArray(config)) {
+    throw new TypeError("Invalid input: expected 'config' to be an object");
+  }
+
+  ["dot", "dash", "charDelim", "wordDelim"].forEach((value) => {
+    if (
+      config &&
+      value in config &&
+      typeof (config as Record<string, unknown>)[value] !== "string"
+    ) {
+      throw new TypeError(
+        `Invalid input: expected config.${value} to be a string`,
+      );
+    }
+  });
+
   if (
-    typeof config.dot !== "string" ||
-    typeof config.dash !== "string" ||
-    typeof config.charDelim !== "string" ||
-    typeof config.wordDelim !== "string" ||
+    config &&
+    "ignoreUnknown" in config &&
     typeof config.ignoreUnknown !== "boolean"
   ) {
-    return false;
+    throw new TypeError(
+      "Invalid input: expected config.ignoreUnknown to be a boolean",
+    );
   }
-
-  return true;
-}
-
-function normalizeText(text: string): string {
-  const normalizedText: string = text
-    .trim()
-    .replaceAll(/\s+/g, " ")
-    .toUpperCase();
-
-  return normalizedText;
-}
-
-function updateDictionary(
-  sourceDictionary: Record<string, string>,
-  config: MorseConfig,
-): Record<string, string> {
-  const updatedDictionary: Record<string, string> = {};
-
-  for (const [letter, sourceCode] of Object.entries(sourceDictionary)) {
-    let updatedCode = "";
-
-    for (const char of sourceCode) {
-      switch (char) {
-        case ".":
-          updatedCode += config.dot;
-          break;
-        case "-":
-          updatedCode += config.dash;
-          break;
-        case " ":
-          updatedCode += config.charDelim;
-          break;
-        case "/":
-          updatedCode += config.wordDelim;
-          break;
-      }
-    }
-
-    updatedDictionary[letter] = updatedCode;
-  }
-
-  return updatedDictionary;
 }
