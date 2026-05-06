@@ -1,7 +1,7 @@
 export interface Config {
-  dot?: string;
-  dash?: string;
-  charDelim?: string;
-  wordDelim?: string;
-  ignoreUnknown?: boolean;
+  dot: string;
+  dash: string;
+  tokenSeparator: string;
+  symbolSeparator: string;
+  ignoreUnknown: boolean;
 }
