@@ -4,4 +4,5 @@ export interface Config {
   tokenSeparator: string;
   symbolSeparator: string;
   ignoreUnknown: boolean;
+  dictionary: "internationalMorseCode";
 }

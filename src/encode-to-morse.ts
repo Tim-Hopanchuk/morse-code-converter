@@ -1,4 +1,5 @@
 import type { Config } from "./types";
+import { internationalMorseCode } from "./dictionaries/international-morse-code";
 
 export function encodeToMorse(
   rawText: string,
@@ -18,7 +19,15 @@ export function encodeToMorse(
     const symbols: string[] = [];
 
     for (const letter of letters) {
-      symbols.push(getSymbol(letter, dictionary, config.ignoreUnknown));
+      const symbol: string = getSymbol(
+        letter,
+        dictionary,
+        config.ignoreUnknown,
+      );
+
+      if (symbol !== "") {
+        symbols.push(symbol);
+      }
     }
 
     const token: string = symbols.join(config.symbolSeparator);
@@ -30,19 +39,98 @@ export function encodeToMorse(
 }
 
 function validateInput(rawText: unknown, options: unknown): void {
-  // NOT IMPLEMENTED YET
+  if (typeof rawText !== "string") {
+    throw new Error("Invalid input: expected rawText to be a string");
+  }
+
+  if (
+    typeof options !== "object" ||
+    options === null ||
+    Array.isArray(options)
+  ) {
+    throw new Error("Invalid input: expected options to be an object");
+  }
+
+  if ("dot" in options && typeof options.dot !== "string") {
+    throw new Error("Invalid input: expected options.dot to be a string");
+  }
+
+  if ("dash" in options && typeof options.dash !== "string") {
+    throw new Error("Invalid input: expected options.dash to be a string");
+  }
+
+  if (
+    "tokenSeparator" in options &&
+    typeof options.tokenSeparator !== "string"
+  ) {
+    throw new Error(
+      "Invalid input: expected options.tokenSeparator to be a string",
+    );
+  }
+
+  if (
+    "symbolSeparator" in options &&
+    typeof options.symbolSeparator !== "string"
+  ) {
+    throw new Error(
+      "Invalid input: expected options.symbolSeparator to be a string",
+    );
+  }
+
+  if (
+    "ignoreUnknown" in options &&
+    typeof options.ignoreUnknown !== "boolean"
+  ) {
+    throw new Error(
+      "Invalid input: expected options.ignoreUnknown to be a boolean",
+    );
+  }
 }
 
 function normalize(rawText: string): string {
-  // NOT IMPLEMENTED YET
+  const text: string = rawText.replaceAll(/\s+/g, " ").trim().toUpperCase();
+  return text;
 }
 
 function buildConfig(options: Partial<Config>): Config {
-  // NOT IMPLEMENTED YET
+  const config: Config = {
+    dot: ".",
+    dash: "-",
+    tokenSeparator: " / ",
+    symbolSeparator: " ",
+    ignoreUnknown: false,
+    dictionary: "internationalMorseCode",
+    ...options,
+  };
+  return config;
 }
 
 function buildDictionary(config: Config): Record<string, string> {
-  // NOT IMPLEMENTED YET
+  let source: Record<string, string> = {};
+
+  if (config.dictionary === "internationalMorseCode") {
+    source = internationalMorseCode;
+  }
+
+  const dictionary: Record<string, string> = {};
+
+  for (const letter in source) {
+    const chars: string[] = [];
+
+    for (const sourceChar of source[letter]) {
+      if (sourceChar === ".") {
+        chars.push(config.dot);
+      }
+
+      if (sourceChar === "-") {
+        chars.push(config.dash);
+      }
+    }
+
+    dictionary[letter] = chars.join("");
+  }
+
+  return dictionary;
 }
 
 function getSymbol(
@@ -50,5 +138,17 @@ function getSymbol(
   dictionary: Record<string, string>,
   ignoreUnknown: boolean,
 ): string {
-  // NOT IMPLEMENTED YET
+  if (letter === "") {
+    return "";
+  }
+
+  if (letter in dictionary) {
+    return dictionary[letter];
+  }
+
+  if (!ignoreUnknown) {
+    throw new Error(`Invalid input: letter ${letter} is not allowed in text`);
+  }
+
+  return "";
 }
