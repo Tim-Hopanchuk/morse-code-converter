@@ -2,6 +2,17 @@
 // Recommendation M.1677-1 (10/2009)
 // Approved in 2009-10-03
 
+/*
+UNSUPPORTED:
+
+"Understood": "...-.",
+"Error": "........",
+"Invitation to transmit": "-.-",
+"Wait": ".-...",
+"End of work": "...-.-",
+"Starting signal": "-.-.-", 
+*/
+
 export const internationalMorseCode = {
   // Letters
   "A": ".-",
@@ -58,10 +69,4 @@ export const internationalMorseCode = {
   "/": "-..-.",
   "(": "-.--.",
   ")": "-.--.-",
-  "Understood": "...-.",
-  "Error": "........",
-  "Invitation to transmit": "-.-",
-  "Wait": ".-...",
-  "End of work": "...-.-",
-  "Starting signal": "-.-.-",
 };

@@ -1,4 +1,4 @@
-import { decodeFromMorse } from "../src/decode-from-morse";
+import { decodeFromMorse } from "../src/morse-codec";
 import { Config } from "../src/types";
 import { describe, expect, it } from "vitest";
 
@@ -14,7 +14,7 @@ describe("decodeFromMorse - Success cases", () => {
   const testCases: TestCase[] = [
     {
       name: "decodes A-Z letters",
-      code: ".- -... -.-. -.. . ..-. --. .... .. .--- -.- .-.. -- -. --- .--. --.- .-. ... - ..- ...- .-- -..- -.-- --..",
+      code: ".- -... -.-. -.. . ..-.. ..-. --. .... .. .--- -.- .-.. -- -. --- .--. --.- .-. ... - ..- ...- .-- -..- -.-- --..",
       expectedText: "ABCDEÉFGHIJKLMNOPQRSTUVWXYZ",
     },
     {
@@ -106,12 +106,12 @@ describe("decodeFromMorse - Error cases", () => {
       options: {
         ignoreUnknown: false,
       },
-      expectedError: "Invalid input: symbol .%- is not allowed in code",
+      expectedError: "Invalid input: .%- is not allowed in source",
     },
     {
       name: "throws when code is not a string",
       code: false as any,
-      expectedError: "Invalid input: expected code to be a string",
+      expectedError: "Invalid input: expected source to be a string",
     },
     {
       name: "throws when options is a string",

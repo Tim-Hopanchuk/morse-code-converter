@@ -1,4 +1,4 @@
-import { encodeToMorse } from "../src/encode-to-morse";
+import { encodeToMorse } from "../src/morse-codec";
 import { Config } from "../src/types";
 import { describe, expect, it } from "vitest";
 
@@ -16,13 +16,13 @@ describe("encodeToMorse - Success cases", () => {
       name: "encodes a-z letters",
       text: "abcdeéfghijklmnopqrstuvwxyz",
       expectedCode:
-        ".- -... -.-. -.. . ..-. --. .... .. .--- -.- .-.. -- -. --- .--. --.- .-. ... - ..- ...- .-- -..- -.-- --..",
+        ".- -... -.-. -.. . ..-.. ..-. --. .... .. .--- -.- .-.. -- -. --- .--. --.- .-. ... - ..- ...- .-- -..- -.-- --..",
     },
     {
       name: "encodes A-Z letters",
       text: "ABCDEÉFGHIJKLMNOPQRSTUVWXYZ",
       expectedCode:
-        ".- -... -.-. -.. . ..-. --. .... .. .--- -.- .-.. -- -. --- .--. --.- .-. ... - ..- ...- .-- -..- -.-- --..",
+        ".- -... -.-. -.. . ..-.. ..-. --. .... .. .--- -.- .-.. -- -. --- .--. --.- .-. ... - ..- ...- .-- -..- -.-- --..",
     },
     {
       name: "encodes 0-9 figures",
@@ -141,12 +141,12 @@ describe("encodeToMorse - Error cases", () => {
       options: {
         ignoreUnknown: false,
       },
-      expectedError: "Invalid input: letter % is not allowed in text",
+      expectedError: "Invalid input: % is not allowed in source",
     },
     {
-      name: "throws when text is not a string",
+      name: "throws when rawText is not a string",
       text: 15 as any,
-      expectedError: "Invalid input: expected text to be a string",
+      expectedError: "Invalid input: expected source to be a string",
     },
     {
       name: "throws when options is a number",
